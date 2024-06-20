@@ -1,4 +1,4 @@
-// HomePage.js
+// src/components/HomePage.js
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Card, Button, DropdownButton, Dropdown, Pagination } from 'react-bootstrap';
@@ -8,6 +8,7 @@ import DetailArticleView from './DeatailArticleView'; // Adjust the import path 
 const HomePage = () => {
   const dispatch = useDispatch();
   const articles = useSelector((state) => state.news.articles);
+  const status = useSelector((state) => state.news.status);
   const currentPage = useSelector((state) => state.news.currentPage);
   const [category, setCategory] = useState('general');
   const [selectedArticle, setSelectedArticle] = useState(null);
@@ -18,6 +19,7 @@ const HomePage = () => {
 
   const handleCategoryChange = (selectedCategory) => {
     setCategory(selectedCategory);
+    dispatch(setPage(1)); // Reset to first page when category changes
   };
 
   const handleArticleClick = (article) => {
@@ -38,6 +40,8 @@ const HomePage = () => {
         <Dropdown.Item eventKey="entertainment">Entertainment</Dropdown.Item>
       </DropdownButton>
       <div className="row">
+        {status === 'loading' && <p>Loading...</p>}
+        {status === 'error' && <p>Error fetching articles</p>}
         {articles.map((article) => (
           <Card key={article.url} style={{ width: '18rem' }} onClick={() => handleArticleClick(article)}>
             <Card.Img variant="top" src={article.urlToImage} />
@@ -50,11 +54,9 @@ const HomePage = () => {
         ))}
       </div>
       <Pagination className="mt-5">
-        {[1, 2, 3, 4, 5].map(pageNumber => (
-          <Pagination.Item key={pageNumber} active={pageNumber === currentPage} onClick={() => handlePageChange(pageNumber)}>
-            {pageNumber}
-          </Pagination.Item>
-        ))}
+        <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
+        <Pagination.Item active>{currentPage}</Pagination.Item>
+        <Pagination.Next onClick={() => handlePageChange(currentPage + 1)} />
       </Pagination>
       {selectedArticle && <DetailArticleView article={selectedArticle} />}
     </div>
