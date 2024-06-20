@@ -1,16 +1,13 @@
-// src/features/newSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-// Fetch the API key from environment variables
-const apiKey = process.env.NEXT_PUBLIC_NEWS_API_KEY;
+const apiKey = "d0727afadbf3479ca13969dadcd3dfa2";
 
 export const fetchNewsArticles = createAsyncThunk(
   'news/fetchNewsArticles',
   async ({ category, page }, { rejectWithValue }) => {
     try {
-      const apiUrl = `https://newsapi.org/v2/top-headlines?country=us&category=${category}&page=${page}&apiKey=${apiKey}`;
-      const response = await axios.get(apiUrl);
+      const response = await axios.get(`https://newsapi.org/v2/top-headlines?country=us&category=${category}&page=${page}&apiKey=${apiKey}`);
       return response.data.articles;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -30,7 +27,7 @@ const newsSlice = createSlice({
   reducers: {
     setPage: (state, action) => {
       state.currentPage = action.payload;
-    },
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -41,7 +38,7 @@ const newsSlice = createSlice({
         state.status = 'idle';
         state.articles = action.payload;
       })
-      .addCase(fetchNewsArticles.rejected, (state) => {
+      .addCase(fetchNewsArticles.rejected, (state, action) => {
         state.status = 'error';
       });
   },
